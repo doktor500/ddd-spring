@@ -1,0 +1,49 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'spring-boot'
+apply plugin: 'idea'
+
+repositories {
+    mavenCentral()
+    maven { url 'http://repo.spring.io/milestone' }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.1.6.RELEASE')
+    }
+}
+
+configurations {
+    runtimeLibs
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.3'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework:spring-tx:4.0.6.RELEASE'
+    compile 'org.springframework:spring-aspects:4.0.6.RELEASE'
+    compile 'org.aspectj:aspectjrt:1.8.2'
+
+    runtimeLibs 'org.springframework:spring-instrument:4.0.6.RELEASE'
+}
+
+jar {
+    baseName = 'ddd-spring'
+    version = '0.1.0'
+}
+
+task createRuntimeLibs(type: Copy) {
+    into "$buildDir/libs"
+    from configurations.runtimeLibs
+}
+
+task runApp(dependsOn: ['jar', 'createRuntimeLibs'], type: JavaExec) {
+    main = 'com.kenfos.ddd.Application'
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs "-javaagent:$buildDir/libs/spring-instrument-4.0.6.RELEASE.jar"
+}
