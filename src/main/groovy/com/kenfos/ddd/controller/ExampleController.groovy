@@ -13,7 +13,8 @@ class ExampleController {
         client.dependency
     }
 
-    private Client getClient() {
-      new Client()
+    private getClient() {
+      Client client = new Client()
+      client
     }
 }
